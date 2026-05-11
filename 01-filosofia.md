@@ -81,6 +81,21 @@ Dalla tesi e dalla distinzione substrato/harness discendono i principi che gover
 10. **Agnosticismo sull'identità.** Il harness non assume chi è l'utente. L'identità vive nei dati accumulati, non nel codice né nei prompt. Questa istanza ha un proprietario specifico, ma è un fatto del dataset, non del codice.
 11. **Agnosticismo sugli input.** Muffin deve poter integrare fonti nuove senza un adapter custom per ognuna. Un sensore nuovo, un feed nuovo arrivano come contenuto semantico interpretabile, non come schema pre-definito. Il modello fa il lavoro di comprensione al momento dell'uso.
 12. **Audit periodico.** Architettura dichiarata e architettura eseguita divergono nel tempo. La pratica disciplinata di auditare cosa il sistema fa davvero (non cosa pensiamo che faccia) è più importante della pulizia iniziale del design.
+13. **Codice quando è codice, modello quando è giudizio.** Tutto ciò che si può fare deterministicamente in codice va fatto in codice: schema, indici, cascade di invalidazione, formule di peso esplicite, fast-path di matching, gate statistici. Il modello è strumento chirurgico per due classi di operazione: *thinking* (decisioni semantiche su contesto ambiguo dove non esiste regola scrivibile, come la disambiguazione tra entità simili o il riconoscimento che predicati lessicalmente diversi denotano la stessa relazione) e *voice* (generazione finale dell'output verso l'utente). Il default è codice; lo spostamento al modello è giustificato caso per caso. "Metti un modello" come reazione modernista è anti-pattern — usare il modello dove non serve è premature complexity, costa in latenza e budget di inferenza, e rende il comportamento aggregato opaco.
+
+---
+
+## Due contesti, una voce — privato e gruppo
+
+Muffin opera in due contesti distinti che richiedono governance separata, e questa separazione è un commitment di costruzione, non una regola applicativa che ammette eccezioni.
+
+Il primo contesto è il **privato**: una conversazione 1:1 con il proprietario, dove l'intera macchina cognitiva descritta nelle sezioni successive (memoria longitudinale, living profile, counterpoint, awareness loop) è calibrata sopra una persona singola.
+
+Il secondo contesto è il **gruppo**: chat Telegram pubbliche con più persone, dove Muffin viene a volte invitato e partecipa. La voce — tagliente, opinata, dispostissima al push-back — resta invariata; quello che cambia è *cosa Muffin sa*. La memoria è isolata, il modello del proprietario non è disponibile né leggibile dal gruppo, il modello degli altri partecipanti è leggero (entità con qualche attributo derivato dalle interazioni di gruppo, non blob narrativi a piena profondità), i criteri proattivi sono molto più stretti — niente osservazioni spontanee, solo risposta on-demand.
+
+Il principio dietro: la voce è la cosa che rende Muffin riconoscibile e che la community apprezza; addolcirla "per il pubblico" sarebbe esattamente il tipo di drift adattivo che il counterpoint cerca di evitare. Ma il dataset accumulato sulla persona singola non deve fluttuare in chat pubblica: il privacy leak da single-user model che esce in gruppo è il rischio strutturale che la separazione architettata previene.
+
+In pratica: ogni nuova capability del sistema (un predictor nuovo, un decider che decide quando parlare, un canale di input nuovo) viene progettata fin dal giorno zero per rispettare questa separazione, non adattata a posteriori. Il costo cumulativo di rifattorizzare ex post — dopo che il leak è già accaduto — è esponenzialmente più alto che progettare per scope dal day one.
 
 ---
 

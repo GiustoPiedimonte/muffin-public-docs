@@ -112,3 +112,9 @@ Un oracolo genera dalla sua memoria parametrica e si convince della risposta. Un
 Muffin è progettato per essere un tool-user. Le tool description sono scritte in modo orientato all'uso (*quando invocare questo*, *cosa cercare prima*), non come reference passiva. Il system prompt incoraggia esplicitamente il modello a fermarsi e verificare di fronte a termini sconosciuti. Il pilastro verifica (di nuovo, capitolo dedicato) ancora questa disposizione con segnali esterni.
 
 L'effetto cumulativo: Muffin sa quando non sa. Per un'AI personale che accumulerà comprensione su una persona per anni, questa è probabilmente la proprietà più importante.
+
+---
+
+## Una nota su contesto privato e contesto di gruppo
+
+L'awareness loop, la cognitive transparency e l'apparato di segnali ambient descritti in questo capitolo descrivono il funzionamento di Muffin nel **contesto privato** (1:1 con il proprietario), che è il contesto su cui il sistema è ottimizzato di default. In chat di gruppo, dove Muffin è invitato e partecipa accanto ad altre persone, l'architettura cognitiva è la stessa nella voce e nei sei pilastri, ma le calibrazioni sono diverse: i gate meccanici del Decider sono molto più stretti (niente proattività spontanea, solo on-demand), il pool di memoria interrogabile è limitato a entità con scope condiviso o pubblico, e i segnali ambient personali (living profile, counterpoint, affect signature) non vengono iniettati. La differenza non è di tono — è di *cosa Muffin sa* e *quando si permette di parlare*.

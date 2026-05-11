@@ -32,9 +32,13 @@ Muffin non sta costruendo un'architettura *nuova*. Sta combinando elementi che l
 
 **Pare-Bench** (2025) ha empiricamente caratterizzato la tendenza di modelli di taglia media a proporre soluzioni prematuramente in più di tre quarti dei casi quando non ci sono vincoli meccanici. Il risultato ha informato direttamente la scelta di Muffin di mantenere gate meccanici severi sull'output proattivo, rimuovendo invece gate epistemici sul *cosa* il modello può considerare.
 
-### Hindsight learning e correzione
+### Convergenza dei componenti agentici
 
-**Hindsight Experience Replay** (2017, riconcettualizzato per LLM nel 2024) ha mostrato che imparare dai fallimenti richiede di poter rivisitare situazioni passate sapendo come sono finite — non solo accumulare i successi. Muffin adotta una versione di questo principio nella struttura del counterpoint: ogni dismissione, correzione, predizione sbagliata diventa materiale da cui il sistema apprende cosa non sa fare bene.
+**HyperAgents** (Meta AI, 2025) ha mostrato empiricamente che un agente LLM lasciato libero di self-improve — senza imporre un'architettura a priori — converge spontaneamente sugli stessi sei componenti: tool integration, memoria/stato, context engineering, planning, verifica, modularità. Non sono convenzioni ingegneristiche ma *vincoli funzionali*. Per Muffin questo risultato è centrale strategicamente: se l'architettura agentica è inevitabile, il vantaggio competitivo non sta nell'architettura (che diventa commodity come i modelli) ma nel dataset accumulato sotto quell'architettura. Muffin riconosce consapevolmente i sei pilastri come categorie esplicite di design, anziché nasconderle dietro nomi propri — la struttura è riconoscibile, ciò che la rende Muffin è l'accumulazione.
+
+### Opinioni con confidence e correzione
+
+**Hindsight** (Vectorize, 2025) — *Persistent Memory for AI Agents with Opinion Tracking* — propone un'architettura di memoria a quattro reti separate (world facts, experience facts, observations, opinions con confidence), con meccanismo esplicito di *change of mind*: una contraddizione forte riduce la confidence di un'opinione, e oltre soglia ne aggiorna il testo. Reporta 91.4% su LongMemEval con modello aperto di classe simile a quella usata da Muffin. Il pattern "opinions con confidence + meccanismo di revisione esplicito" è ciò che la confidence esplicita su ogni claim derivato (capitolo memoria + capitolo verifica) traduce in Muffin. Il counterpoint, a sua volta, è il pezzo che fa sì che ogni dismissione, correzione, predizione sbagliata diventi materiale da cui il sistema apprende cosa non sa fare bene — una versione del principio più generale, articolato originariamente in *Hindsight Experience Replay* (Andrychowicz et al., 2017), per cui imparare dai fallimenti richiede di rivisitare situazioni passate sapendo come sono finite, non solo accumulare i successi.
 
 ### Allineamento e silicon mirror
 

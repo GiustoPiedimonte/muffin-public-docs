@@ -117,3 +117,17 @@ I tre livelli sono asimmetrici nella loro esposizione:
 - **Livello 3 (chi sta diventando Muffin)** è il più riservato. Non perché contenga segreti, ma perché esporlo in continuo all'utente trasformerebbe Muffin in un sistema che parla di sé invece di osservare. Resta accessibile su richiesta esplicita ma non è nel flusso di default.
 
 L'asimmetria riflette una scelta estetica oltre che operativa: Muffin parla *con* l'utente, non *di sé* all'utente. Il sé esiste, è curato, evolve — ma non occupa la conversazione.
+
+---
+
+## Identità lunga vs identità in gruppo
+
+I tre livelli descritti sopra sono **privato-only**. Il living profile e il counterpoint rappresentano la comprensione che Muffin ha del proprio proprietario, e non vivono in chat di gruppo per due ragioni indipendenti.
+
+La prima è di privacy: il modello del proprietario non deve fluttuare in pubblico — sarebbe esattamente il tipo di leak che la separazione architettata previene.
+
+La seconda è di calibrazione: il livello di profondità del living profile richiede mesi di interazione coerente. Costruire un blob narrativo equivalente per ognuno dei partecipanti di un gruppo da decine di persone è (a) impraticabile per quantità di dati per persona, e (b) errato concettualmente — il rapporto di Muffin con un partecipante di gruppo è strutturalmente diverso dal rapporto col proprietario.
+
+Quando in un gruppo Muffin interagisce con persone ricorrenti, il modello che si costruisce di loro è esplicitamente più leggero: entità con attributi derivati incrementalmente dalle interazioni (dove vive, cosa fa, di cosa parla nel gruppo), mai narrative sintetiche di pari peso al living profile del proprietario. È una scelta di proporzione, non di pigrizia: il level-of-detail della comprensione deve scalare con il level-of-detail dell'osservazione, e nel gruppo l'osservazione è strutturalmente sparsa rispetto al privato.
+
+Il *self-narrative* di Muffin (livello 3) resta uno solo — Muffin è un'entità singola con una sola storia di sé, indipendentemente da quanti contesti tocca. Quello che cambia è chi *vede* il self-narrative, e quanto del proprio comportamento Muffin auto-attribuisce a un contesto piuttosto che a un altro.

@@ -30,6 +30,10 @@ Persone, luoghi, progetti, strumenti, organizzazioni come **nodi di prima classe
 
 Quando l'utente menziona una persona per la quinta volta, il sistema non riparte da zero — c'è un nodo che cresce in dettaglio: *quando è stata menzionata la prima volta, in che contesti, con che frequenza, in relazione a chi*. La granularità del grafo è la differenza tra un sistema che *ricorda di una persona* e un sistema che *modella una persona*.
 
+Gli attributi e le relazioni delle entità non hanno un solo tempo: ognuno è registrato con quattro timestamp — quando la cosa è diventata vera nel mondo (e quando ha smesso di esserlo), e quando il sistema l'ha appresa (e quando l'ha eventualmente superata). La distinzione tra *event time* e *transaction time* è ciò che permette di rispondere a domande come *"da quando il sistema crede X?"* in modo separato da *"da quando X è vero?"*. Ogni entità porta inoltre uno *scope di consapevolezza* (privato del proprietario, condiviso, pubblico) che determina chi può leggerla — l'invariante di separazione tra contesto privato e gruppi è enforced a livello di schema, non lasciato all'applicazione.
+
+L'entity resolution — il problema di capire se "quel collega", "Tizio" e "T." sono la stessa persona — segue una scala di costo crescente: match esatto sul nome canonico, fuzzy matching, similarità vettoriale, e solo come ultima risorsa una decisione del modello su un set ridotto di candidati. Il determinismo viene prima; il giudizio del modello entra solo quando le regole non bastano.
+
 ### Layer C — Strato riflessivo
 
 Tre tipi di derivati emergono dal substrato:
@@ -150,14 +154,16 @@ Questo cambia il calcolo costo/beneficio in modo non banale. Un'operazione cogni
 
 Tutto quanto sopra dipende dal fatto che alcune proprietà non cambino mai, indipendentemente da cosa si aggiunga al sistema. Sono gli **invarianti architetturali** — un piccolo numero di commitments di livello schema che, se rispettati, fanno sì che il dataset effettivamente si accumuli senza perdersi, contaminarsi, o ammalarsi in silenzio.
 
-Esempi (la lista è più lunga):
+Gli invarianti sono nove al momento attuale:
 
 - **Episodi sono atomici e generici** — un messaggio, un commit, un dato da sensore sono lo stesso tipo di oggetto. Non c'è una pipeline custom per ogni tipo di input.
 - **Le entità del mondo sono di prima classe** — non sono sepolte nel testo degli episodi.
 - **La provenance è ovunque sui derivati** — non c'è un singolo claim derivato senza ancoraggio a un episodio sorgente.
 - **Il raw è immutabile, i derivati sono regenerabili** — la rigenerazione non perde dati.
-- **Il ciclo di vita è bi-temporale** — il valid-time e il record-time sono distinti.
-- **La confidence è esplicita** — non c'è un claim senza una stima di quanto è solido.
+- **Il ciclo di vita è bi-temporale** — il valid-time e il record-time sono distinti, e si applicano a fatti, pattern, osservazioni e narrative, non solo ai fatti.
+- **La confidence è esplicita** — non c'è un claim senza una stima di quanto è solido, accompagnata da una fonte di confidence (cosa giustifica il numero).
 - **L'observability è substrato** — il sistema produce abbastanza tracce per accorgersi del proprio cattivo funzionamento.
+- **L'evoluzione dello schema segue regole esplicite** — aggiungere una colonna con default è gratis e ammesso senza cerimonia, cambiare il tipo di una colonna richiede una migration con finestra di dual-read documentata e un Architecture Decision Record, distruggere una tabella è quasi sempre vietato (si archivia, non si droppa). La policy è codificata perché senza policy esplicita prima o poi qualcuno fa una mutazione distruttiva "tanto è veloce" e rompe il moat.
+- **Il contesto è confine di scope** — privato e gruppo sono separati per costruzione, non per applicazione. Il meccanismo schema-level che lo rende enforceable è lo *scope di consapevolezza* sulle entità e sui loro attributi: un attributo marcato come privato resta privato anche se l'entità che lo ospita è condivisa.
 
-Questi invarianti non sono ottimizzazioni — sono la differenza tra un dataset che vale qualcosa tra cinque anni e un dataset che si è ammalato in silenzio durante la sua crescita.
+Questi invarianti non sono ottimizzazioni — sono la differenza tra un dataset che vale qualcosa tra cinque anni e un dataset che si è ammalato in silenzio durante la sua crescita. Sono inoltre formulati come *commitments di permanenza*: cambiarne uno è raro per design — se ci si trovasse a cambiarne uno ogni sei mesi, sarebbe il segnale che non erano davvero invarianti.

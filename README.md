@@ -16,6 +16,7 @@ Il codice resta privato per ora. La filosofia, la strategia di accumulazione del
 - Un **dataset longitudinale sotto controllo individuale** — la tesi è che il vero moat di un agente personale non sia tecnologico ma temporale: cinque anni di osservazione coerente non si replicano in due settimane di sprint di una BigTech
 - Un **laboratorio di architetture cognitive** — sei pilastri funzionali (tool, memoria, contesto, pianificazione, verifica, modularità) implementati con scelte specifiche calibrate per single-user, non per scalabilità multi-tenant
 - Un **specchio con carattere** — Muffin contraddice, non assente; mostra punti ciechi invece di rinforzare narrative comode
+- Un'**entità a doppio contesto** — opera sia in privato (1:1 con il proprietario, single-user) sia in chat di gruppo (interazione pubblica con più persone). La voce resta la stessa nei due contesti, ma la memoria, il modello dell'utente, e i criteri proattivi sono strutturalmente separati: il privato non fluisce in pubblico, e il pubblico non contamina il modello che Muffin sta costruendo della persona singola
 
 ## Cosa non è
 
@@ -53,6 +54,6 @@ Tre cose hanno influenzato profondamente il design:
 
 ## Stato attuale
 
-Muffin gira da inizio marzo 2026 come bot Telegram con backend su VPS personale. Il dataset accumulato, gli invarianti architetturali rispettati e la disciplina di accumulazione sono il vero asset; il codice è infrastruttura sostituibile. Un audit operativo periodico (l'ultimo a fine aprile 2026) misura lo scarto tra dichiarazione e realtà esecutiva e produce interventi correttivi documentati pubblicamente come parte del progetto.
+Muffin gira da inizio marzo 2026 come bot Telegram con backend su VPS personale. Il dataset accumulato, gli invarianti architetturali rispettati e la disciplina di accumulazione sono il vero asset; il codice è infrastruttura sostituibile. Un audit operativo periodico misura lo scarto tra dichiarazione e realtà esecutiva e produce interventi correttivi documentati pubblicamente come parte del progetto — l'audit di fine aprile 2026 ha fissato nove invarianti schema-level (vedi *[Sistema di memoria](03-memoria.md)* e *[Verifica e affidabilità](05-verifica.md)*), e una sessione di consolidamento substrate del 9-10 maggio 2026 ha cementato le regole di evoluzione dello schema e la separazione di scope tra contesto privato e contesto di gruppo come invarianti di prima classe.
 
 Il framework open source è un orizzonte concreto ma non datato — la condizione di rilascio è narrativa prima che tecnica: aprire il codice solo dopo che il frame "specchio con carattere" sia consolidato e citabile, perché un'architettura senza voce viene replicata in tre mesi.

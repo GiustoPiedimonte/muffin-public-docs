@@ -46,6 +46,8 @@ L'effetto cumulativo: il sistema ha un modello vivente del proprio utente, calib
 
 Il living profile entra nel system prompt del modello a ogni turno, accanto agli altri segnali ambient. Il modello non opera nel vuoto sull'utente; opera sopra una sintesi calibrata della propria comprensione corrente.
 
+Una scelta operativa correlata: la rigenerazione del living profile e del counterpoint non gira sul modello di default del sistema. Sono i due punti del dream cycle dove la sintesi richiede *giudizio* — riconoscere quali pezzi del substrato sono significativi, quali sono rumore, quali contraddicono il profilo precedente — e dove la qualità del modello produce un dataset di profili migliore o peggiore. Muffin paga di notte un modello significativamente più capace per queste due fasi, accettando un costo per generazione più alto perché la latenza non conta e la differenza di qualità diventa parte del dataset accumulato per i mesi successivi. È un'istanza del paradigma *sleep-time compute*: dove il modello di giorno deve essere veloce, il modello di notte può essere lento e migliore.
+
 ---
 
 ## Counterpoint — il lato anti-sycophancy

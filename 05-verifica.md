@@ -52,7 +52,9 @@ Esempi:
 
 Il costo è medio: alcune query al database, eventualmente una chiamata leggera al modello per riscrivere. Ma è pagato solo nei casi che lo giustificano (output asincroni, claim quantitativi/temporali specifici), non sistematicamente.
 
-Il pattern alla base — *re-read after retrieval, revise* — è studiato in letteratura come RARR (*Retrieve, Attribute, Refine and Revise*). Muffin lo adatta al proprio dominio, focalizzandolo su claim temporali e numerici dove la confabulazione ha costo alto.
+Una variante specifica di re-read condizionale: nelle risposte di gruppo in cui Muffin ha appena fatto una ricerca web, gli URL nella risposta finale vengono estratti deterministicamente (regex) e confrontati uno a uno con la concatenazione dei testi tornati dalle ricerche del turno. Se un URL nella risposta non compare verbatim nei risultati di ricerca, è quasi certamente *fabbricato* — un pattern classico in cui il modello inventa uno slug plausibile a partire dal titolo. Il match è una funzione di una riga; il valore è alto perché un URL inventato che entra in un canale pubblico è uno dei modi più visibili in cui un'AI personale può perdere credibilità.
+
+Il pattern alla base — *re-read after retrieval, revise* — è studiato in letteratura come RARR (*Retrieve, Attribute, Refine and Revise*). Muffin lo adatta al proprio dominio, focalizzandolo su claim temporali, numerici e link dove la confabulazione ha costo alto.
 
 ---
 
@@ -92,6 +94,18 @@ Ogni claim derivato (fatto, osservazione, pattern, frammento di profilo) ha una 
 Quando il modello compone una risposta, vede i claim con la loro confidence. Un claim a confidence alta entra nella risposta come asserzione. Un claim a confidence media entra come *"sembra che..."*. Un claim a confidence bassa non entra affatto, oppure entra come domanda esplicita all'utente — *"mi pare di ricordare che... è ancora vero?"*.
 
 Questo trasforma il modo in cui il sistema parla. Non è più un narratore omniscente che afferma; è un osservatore che ha gradi di credenza differenziati su cose diverse, e li espone.
+
+---
+
+## Contradizione come segnale di prim'ordine
+
+Una proprietà collegata alla confidence esplicita, che merita di essere trattata come pillar verifica a sé: il sistema osserva ed estrae anche le proprie *dichiarazioni* — non solo i fatti del substrato, ma le cose che Muffin ha asserito di sé, dell'utente o del mondo nelle sue risposte recenti. Queste dichiarazioni diventano interrogabili come storia.
+
+Quando un turno successivo introduce informazione che potrebbe contraddire una dichiarazione precedente, un classifier valuta la relazione in due passaggi: prima un filtro deterministico di similarità (per evitare di passare al modello coppie semanticamente lontane), poi un classifier di *Natural Language Inference* leggero che distingue tra *contraddizione logica*, *implicazione* e *neutralità*. È una distinzione che il prompt da solo non sa fare bene: un utente che riformula la stessa idea con parole diverse non sta contraddicendo, e trattarlo come tale produce inversioni di posizione gratuite (sycophancy).
+
+Quando emerge una contraddizione genuina, il claim del sistema non sparisce — viene marcato come *contraddetto*, con riferimento al turno che lo ha smentito. Il pool di claim contraddetti recenti viene iniettato come segnale ambient nei turni successivi: il modello sa di avere posizioni in tensione e ha tre vie esplicite (cambiare idea motivando, mantenere la posizione spiegando perché l'evidenza non basta, ignorare il pivot se è già stato risolto). La forma a tre vie è importante per non degenerare nei due estremi (flippare al primo segnale, oppure ignorare la smentita finché l'utente la urla).
+
+Il dettaglio operativo è trattato nel capitolo memoria sotto la voce *belief revision* — qui basta dire che è parte integrante del pillar verifica: la verifica non è solo *"controllo che il claim corrisponda alla realtà"*, è anche *"controllo che il claim corrisponda al resto di quello che ho già detto, e quando non lo fa, lo dichiaro invece di nasconderlo"*.
 
 ---
 

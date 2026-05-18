@@ -91,6 +91,24 @@ La provenance è il meccanismo che rende possibile *l'auditabilità della propri
 
 ---
 
+## Belief revision — il sistema osserva sé stesso e si lascia smentire
+
+Una conseguenza diretta della provenance e della confidence esplicita è che il sistema può fare una cosa che molti agenti non fanno: *contestarsi*. Non quando l'utente lo costringe, ma in continuo, come parte del proprio funzionamento di base.
+
+Il meccanismo è composto da quattro pezzi.
+
+**Estrazione di claim del sistema.** Quando Muffin produce una risposta, un secondo passaggio estrae le asserzioni concrete che ha fatto su sé stesso, sull'utente o sul mondo, e le registra come *bot claim* — con provenance al turno in cui sono state generate. Non sono fatti del substrato: sono dichiarazioni del sistema che diventano interrogabili come storia.
+
+**Detection di contraddizione.** Quando arriva un nuovo turno (utente o sistema), un classifier confronta il suo contenuto con i bot claim recenti che sembrano semanticamente vicini. Il confronto passa per due gate sequenziali: prima un filtro deterministico di similarità (cosine sopra una soglia), poi un classifier di Natural Language Inference (NLI) leggero che distingue se i due testi sono in *contraddizione*, *entailment*, o *neutri*. L'NLI è la differenza tra dire *"il nuovo turno parla dello stesso topic e quindi forse contraddice"* e dire *"il nuovo turno asserisce qualcosa di logicamente incompatibile con il claim precedente"*. La distinzione è importante perché senza, ogni rephrasing dell'utente sembrerebbe una smentita.
+
+**Marking esplicito.** Quando un claim viene contraddetto, non sparisce — viene marcato. Provenance al turno che lo ha smentito, timestamp, link bidirezionale tra i due eventi. Il claim resta interrogabile nella storia (*"quando Muffin pensava X, e quando ha cambiato idea"*), ma smette di essere usato come prior per il presente.
+
+**Pool di revisione iniettato selettivamente.** Quando un turno successivo dell'utente lambisce un'area dove il sistema ha claim contraddetti, il modello vede un segnale ambient — *"hai detto X di recente, dopo è arrivata evidenza Y, l'utente ti aspetta a una posizione esplicita"* — e ha tre vie esplicite di uscita: cambiare idea motivando, mantenere la posizione spiegando perché l'evidenza non basta, oppure ignorare il pivot se è già stato risolto. La forma a tre vie è importante: senza di essa, il modello tende a flippare al primo segnale di disaccordo (sycophancy) o a ignorare la smentita finché l'utente la urla.
+
+Il principio dietro: un'AI personale che non si lascia smentire dal proprio dataset diventa, in mesi, un narratore convinto di sé stesso. Muffin paga il costo computazionale di chiedersi *"sono ancora d'accordo con quello che dicevo ieri?"* per non finire in quella trappola.
+
+---
+
 ## Confidence esplicita
 
 Ogni claim derivato (fatto, osservazione, pattern, frammento di profilo, frammento di counterpoint) ha un valore di confidence esplicito tra zero e uno, accompagnato da una **fonte di confidence**: cosa giustifica il numero.
@@ -121,6 +139,18 @@ Il principio: nessun singolo segnale è abbastanza. Solo la similarità semantic
 
 ---
 
+## Working memory — l'anchor della conversazione corrente
+
+Il retrieval ibrido lavora sulla memoria a lungo termine. Ma c'è una scala temporale più stretta — la conversazione di adesso — che richiede un trattamento separato.
+
+I modelli di linguaggio moderni hanno finestre di attenzione lunghe ma *non uniformi*: l'attenzione effettiva è più alta sulla coda recente del contesto. Mettere materiale storico in cima al prompt e poi lasciare che il modello rincorra il filo della conversazione corrente in mezzo a mille altri token è una ricetta per *pronoun drift* — il modello che risponde a *"sì, esatto"* o *"ma quello che dicevi prima"* riferendosi a un turno sbagliato o, peggio, a un episodio recuperato dal retrieval che non c'entra.
+
+Muffin tratta la *working memory* — i pochi ultimi turni della conversazione corrente — come un blocco di prima classe, iniettato come ultimo elemento del contesto dinamico, dove l'attenzione del modello è più alta. Quando l'utente usa marcatori deittici (*"questo"*, *"quello che dicevi"*, *"così"*) un classifier deterministico riconosce il pattern e dirotta esplicitamente il modello dal cercare nella memoria lunga al guardare la working memory. È un'inversione dell'istinto del modello — *"hai un tool di retrieval, non usarlo qui, la risposta è nella conversazione che hai sotto gli occhi"*.
+
+Il principio: la memoria a lungo termine è uno strato di supporto; la conversazione corrente è il primo posto dove cercare. Confonderli produce risposte allucinatorie con la forma del retrieval e nessuna ancora nel turno presente.
+
+---
+
 ## Dream cycle — il consolidamento notturno
 
 Una volta al giorno (di solito di notte), il sistema esegue una pipeline di consolidamento. È il momento in cui Muffin *capisce*, distinto dai momenti in cui *registra*.
@@ -138,6 +168,8 @@ Le fasi includono (a livelli di astrazione diversi):
 
 Il dream cycle è il pezzo che traduce *registrazione* in *comprensione*. Senza, il sistema continuerebbe ad accumulare episodi senza mai sintetizzarli; il modello opererebbe sopra dati che diventano sempre più voluminosi e sempre meno comprensibili.
 
+Una scelta operativa che vale la pena nominare: non tutte le fasi del dream cycle usano lo stesso modello. Le fasi di estrazione meccanica e validazione statistica girano sul modello di default del sistema, lo stesso che parla con l'utente di giorno. Le fasi di sintesi-con-giudizio — la rigenerazione del living profile e quella del counterpoint — sono routate a un modello significativamente più capace, accettando un costo per turno più alto perché il calcolo avviene di notte e non paga la latenza dell'interazione. È un'illustrazione concreta del paradigma *sleep-time compute* trattato nel prossimo paragrafo: il vincolo di reattività è rilassato, quindi si può comprare qualità dove la qualità conta.
+
 ---
 
 ## Sleep-time compute — un nuovo paradigma di costo
@@ -147,6 +179,22 @@ Una proprietà importante del dream cycle: gran parte del lavoro cognitivo del s
 Questo cambia il calcolo costo/beneficio in modo non banale. Un'operazione cognitiva che costerebbe troppo eseguire al volo (parecchi secondi di pensiero, decine di chiamate al modello) diventa accettabile se eseguita una volta di notte. Permette al sistema di *capire* l'utente in modi che sarebbero impraticabili in tempo reale, e di rendere disponibile la comprensione in tempo reale al momento successivo.
 
 È la stessa logica per cui un cervello consolida i ricordi durante il sonno. Non è un'analogia neuroscientifica forzata — è il modo in cui il vincolo *"il sistema deve rispondere veloce all'utente"* libera spazio per *"il sistema può pensare lentamente quando l'utente non c'è"*.
+
+---
+
+## La memoria di gruppo, e perché è strutturalmente diversa
+
+Tutto quanto sopra descrive la memoria nel contesto privato. In chat di gruppo la macchina è la stessa nei meccanismi base (entità, episodi, retrieval ibrido) ma calibrata su un'asimmetria importante: in gruppo Muffin non sta costruendo il modello di una persona, sta partecipando a una conversazione collettiva.
+
+Da qui tre scelte specifiche.
+
+**Episodi di gruppo con retention più breve.** Le conversazioni di gruppo si accumulano in un substrato separato e con orizzonte temporale corto. Non perché ne valga meno il contenuto, ma perché il *valore marginale per persona* di un episodio di gruppo è strutturalmente più basso del valore di un episodio privato — il dataset utile per conoscere il proprietario non passa di lì.
+
+**Recall semantico, cronologico, e per-condivisione.** Il modello, in gruppo, può cercare nei messaggi del canale con gli stessi tre segnali della memoria privata (semantico, parole chiave, vicinanza nel grafo) ma il pool interrogabile è limitato a entità di scope condiviso o pubblico. Esiste anche un modo speciale di recall — *"cosa è stato condiviso in questo canale che è stato citato più volte"* — che funziona come memoria collettiva del gruppo senza richiedere profilo per-utente.
+
+**Registro di gruppo — il tono come segnale aggregato.** Una scelta caratteristica: Muffin tiene un *registro* del tono di ogni canale (energia, valenza emotiva media, ritmo dei turni) come signature **aggregata di tutto il canale, mai per-utente**. Il segnale è iniettato come contesto leggero quando Muffin partecipa, e gli permette di calibrare il proprio tono (più asciutto, più giocoso, più cauto) sull'energia del posto senza profilare gli individui. L'invariante è enforced via assertion: la signature non può superare una dimensione minima, e non può contenere identificatori utente. Il principio: si può imparare a parlare bene a un gruppo senza dover sapere chi sono individualmente i partecipanti.
+
+L'isolamento tra contesto privato e contesto di gruppo non è una regola applicativa — è enforced a livello di moduli: il codice che gestisce i gruppi non può importare funzioni del modulo memoria privata, e un controllo automatico in CI verifica che questa separazione non venga rotta da un commit distratto.
 
 ---
 

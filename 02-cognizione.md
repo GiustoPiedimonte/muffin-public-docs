@@ -1,6 +1,6 @@
 # 02. Architettura cognitiva
 
-> I sei pilastri funzionali, l'*awareness loop* che sostituisce i tick periodici, e la *cognitive transparency* che rende il modello consapevole del proprio stato interno.
+> I sei pilastri funzionali, l'*awareness loop* che sostituisce i tick periodici, la *cognitive transparency* che rende il modello consapevole del proprio stato interno, e il primo strato dell'*executive* — skill come programmi con piano fisso, e bozza-da-confermare per tutto ciò che esce verso terzi.
 
 ---
 
@@ -14,7 +14,7 @@ Muffin organizza il proprio design intorno a questi sei.
 
 Cosa risolve: trasformare un modello di linguaggio in un'entità che può fare cose nel mondo (leggere uno stato, scrivere un fatto, mandare un messaggio, interrogare un calendario, in futuro eseguire un comando su un dispositivo domestico quando l'utente lo chiede).
 
-Come Muffin lo affronta: ogni capability è esposta come tool con descrizione orientata all'uso (*quando chiamarlo*, *cosa fa*, *cosa restituisce*). I tool sono organizzati in zone di permesso (*green* — esegui subito, *yellow* — conferma in batch, *red* — conferma esplicita) calibrate sul *blast radius* dell'azione. Le letture sono sempre verdi; le scritture su risorse esterne irreversibili sono sempre rosse.
+Come Muffin lo affronta: ogni capability è esposta come tool con descrizione orientata all'uso (*quando chiamarlo*, *cosa fa*, *cosa restituisce*). I tool sono organizzati in zone di permesso (*green* — esegui subito, *yellow* — conferma in batch, *red* — conferma esplicita, *outward* — l'azione raggiunge un terzo a nome dell'utente e nasce sempre come bozza da confermare) calibrate sul *blast radius* dell'azione. Le letture sono sempre verdi; le scritture su risorse esterne irreversibili sono sempre rosse; quello che esce verso altre persone — una mail, un invito — non parte mai senza che l'utente abbia visto e approvato esattamente cosa sta per uscire.
 
 ### 2. Memoria — la continuità nel tempo
 
@@ -32,7 +32,7 @@ Come Muffin lo affronta: retrieval ibrido (vettoriale + keyword + grafo) per la 
 
 Cosa risolve: il modello reagisce bene a stimoli, ma per essere utile deve anche *iniziare* azioni — quando notare qualcosa, quando svegliarsi, quando proporre.
 
-Come Muffin lo affronta: l'*awareness loop* (sotto), che non è un cron periodico ma un sistema che decide *quando* svegliarsi in base allo stato corrente dell'utente, e gate meccanici che limitano *quando* può parlare proattivamente.
+Come Muffin lo affronta: l'*awareness loop* (sotto), che non è un cron periodico ma un sistema che decide *quando* svegliarsi in base allo stato corrente dell'utente, e gate meccanici che limitano *quando* può parlare proattivamente. Per le azioni a più passi, il piano non viene improvvisato dal modello a runtime — vive in *skill* con sequenza fissa decisa in fase di authoring (vedi §Agire, sotto).
 
 ### 5. Verifica — il controllo sull'output
 
@@ -55,6 +55,16 @@ Il modo classico di rendere un agente "proattivo" è un cron periodico: ogni N m
 Il problema non è *"controllare ogni N minuti"*. È *"essere sveglio quando serve, dormire quando non serve"*. Una persona la mattina, mentre fa colazione, non vuole una notifica. La stessa persona, dopo un commit doloroso a tarda sera, potrebbe trarre beneficio da una domanda. Il cron periodico tratta i due momenti uguale; l'*awareness loop* li tratta diversamente.
 
 L'*awareness loop* di Muffin è composto da tre componenti.
+
+```mermaid
+flowchart LR
+    S["Segnali<br/>messaggio, commit, calendario, silenzio"] --> P["Predictor<br/>dove si trova l'utente adesso"]
+    P --> SC["Scheduler<br/>prossimo risveglio mirato"]
+    SC --> D["Decider<br/>parlare, tacere, eseguire"]
+    D --> G{"Gate meccanici<br/>cooldown, DND, budget"}
+    G -->|aperti| OUT["Output proattivo"]
+    G -->|chiusi| SIL["Silenzio — si riprova al prossimo risveglio"]
+```
 
 ### Predictor — la rappresentazione dello stato dell'utente
 
@@ -115,6 +125,23 @@ Un oracolo genera dalla sua memoria parametrica e si convince della risposta. Un
 Muffin è progettato per essere un tool-user. Le tool description sono scritte in modo orientato all'uso (*quando invocare questo*, *cosa cercare prima*), non come reference passiva. Il system prompt incoraggia esplicitamente il modello a fermarsi e verificare di fronte a termini sconosciuti. Il pilastro verifica (di nuovo, capitolo dedicato) ancora questa disposizione con segnali esterni.
 
 L'effetto cumulativo: Muffin sa quando non sa. Per un'AI personale che accumulerà comprensione su una persona per anni, questa è probabilmente la proprietà più importante.
+
+---
+
+## Agire — programmi, non improvvisazione
+
+Dal giugno 2026 Muffin ha il primo strato di un *executive*: la capacità non solo di sapere e dire, ma di fare cose a più passi per conto del proprio utente — organizzare un incontro, preparare una mail. Il design di questo strato segue una distinzione che la ricerca sugli agenti ha reso netta: la differenza tra un *workflow* (sequenza di passi nota in anticipo, eseguita in modo affidabile) e un *agent* (il modello decide i passi strada facendo). Per azioni che toccano il mondo, Muffin sceglie deliberatamente il primo.
+
+Una **skill** è un programma riusabile: una sequenza nominata di passi con *slot tipati* — i buchi da riempire (chi invitare, quando, su che tema). La struttura ha due tempi con requisiti opposti:
+
+- **Authoring** — scrivere una skill nuova è un evento raro che richiede giudizio. Avviene con un modello capace e con supervisione umana: la skill entra nella libreria solo dopo che il suo piano è stato visto e approvato.
+- **Execution** — lanciare una skill esistente è frequente e delimitato. Il modello locale non deve inventare il piano (è fisso, deciso all'authoring); deve solo riempire gli slot, attingendo all'entity graph per le informazioni che il sistema già possiede.
+
+La separazione non è un dettaglio di implementazione — è la risposta a un risultato empirico ripetuto: lasciare che un modello di taglia media decomponga un compito a runtime *peggiora* l'affidabilità, anche rispetto allo stesso modello con un piano fisso. L'improvvisazione è il punto debole; l'esecuzione vincolata è il punto di forza. La skill mette l'improvvisazione dove c'è supervisione (authoring) e l'esecuzione dove c'è autonomia (runtime).
+
+Quando una skill produce un'azione che esce verso un terzo — una mail, un invito a una riunione — entra la zona *outward*: l'azione nasce come **bozza**, l'utente vede un'anteprima leggibile di esattamente cosa sta per uscire, e la conferma è il gate. Dopo la conferma c'è ancora una finestra di grazia per annullare, e meccanismi di idempotenza evitano il doppio invio. Il principio dietro è lo stesso del write-on-confirmation della filosofia: *un'entità che agisce verso terzi a nome tuo ha una responsabilità diversa da una che ti parla* — e quella responsabilità non si delega all'ottimismo del modello.
+
+L'orizzonte di questo strato è il punto in cui l'executive incontra lo specchio: *"ho notato che fai spesso questa cosa — vuoi che impari a farla?"*. Le skill non sono un app store; sono una libreria che cresce dall'osservazione della persona. Più Muffin conosce il suo utente, più impara a fare per lui.
 
 ---
 

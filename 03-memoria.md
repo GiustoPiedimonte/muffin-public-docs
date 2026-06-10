@@ -20,6 +20,18 @@ Muffin organizza la memoria per affrontare entrambe le dimensioni.
 
 Sette strati, ognuno con governance e ruolo distinto. La gerarchia non è gerarchia di importanza — è gerarchia di *quanto un'informazione si avvicina a essere "comprensione" rispetto a "registrazione"*.
 
+```mermaid
+flowchart TD
+    A["Episodi grezzi<br/>immutabili, mai cancellati"] --> B["Entity graph<br/>persone, progetti, luoghi come nodi"]
+    A --> C["Strato riflessivo<br/>fatti, osservazioni, pattern — con confidence"]
+    B --> C
+    C --> E["Identità lunga<br/>living profile + counterpoint"]
+    DC["Dream cycle notturno"] -. rigenera i derivati dal substrato .-> C
+    DC -.-> E
+```
+
+*I layer di contenuto e la loro derivazione: tutto sopra gli episodi grezzi è ricalcolabile; gli episodi non si toccano mai. Gli strati operativi (stato di consapevolezza, gate meccanici, scaffolding) non sono mostrati.*
+
 ### Layer A — Sostrato conversazionale
 
 I messaggi grezzi, gli episodi (eventi atomici di tipo generico — un messaggio dell'utente, un commit ricevuto, un evento di calendario, un dato da sensore quando arriverà). Questo strato è **immutabile**: una volta scritto, non si modifica e non si cancella mai. È il dataset accumulato letteralmente. Ogni altro layer è derivato da questo, e questa è la garanzia che derivati corrotti possono sempre essere rigenerati.
@@ -163,7 +175,7 @@ Le fasi includono (a livelli di astrazione diversi):
 - **Pruning di narrative dormienti** — narrative che non sono state riattivate per periodi lunghi vengono archiviate (con soft-delete, mai cancellate fisicamente)
 - **Rigenerazione del profilo dell'utente** dal substrato (vedi capitolo dedicato), per evitare drift accumulato
 - **Rigenerazione del counterpoint** — l'altro lato del profilo, dove Muffin riconosce di leggere male l'utente
-- **Aggiornamento del self-narrative di Muffin** — chi sta diventando il sistema, alimentato dalla traccia delle proprie azioni recenti
+- **Aggiornamento del self-narrative di Muffin** (progettato, non ancora attivo — vedi [Identità lunga](04-identita.md) §livello 3) — chi sta diventando il sistema, alimentato dalla traccia delle proprie azioni recenti
 - **Generazione di highlights di delta** — un sommario di *cosa è cambiato stanotte* che il modello vede in chiaro nei turni successivi (cognitive transparency)
 
 Il dream cycle è il pezzo che traduce *registrazione* in *comprensione*. Senza, il sistema continuerebbe ad accumulare episodi senza mai sintetizzarli; il modello opererebbe sopra dati che diventano sempre più voluminosi e sempre meno comprensibili.

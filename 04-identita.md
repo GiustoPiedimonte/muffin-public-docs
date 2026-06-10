@@ -1,6 +1,6 @@
 # 04. Identità lunga
 
-> Tre livelli di sé. Chi è Muffin per principio (statico). Chi è l'utente nella comprensione di Muffin (rigenerato di notte). Chi sta diventando Muffin nel tempo (storia di sé). Più il *counterpoint*, dove Muffin riconosce di leggere male l'utente.
+> Tre livelli di sé. Chi è Muffin per principio (statico). Chi è l'utente nella comprensione di Muffin (rigenerato di notte). Chi sta diventando Muffin nel tempo (storia di sé — progettato, non ancora acceso). Più il *counterpoint*, dove Muffin riconosce di leggere male l'utente.
 
 ---
 
@@ -71,24 +71,26 @@ Il counterpoint produce anch'esso *delta highlights* (*"nuove correzioni emerse 
 
 ## Livello 3 — Chi sta diventando Muffin (self-narrative)
 
-Il livello più sottile. Non è un commitment statico (come il livello 1) né una rappresentazione dell'altro (come il livello 2). È la storia di sé del sistema in evoluzione.
+Il livello più sottile — e, al giugno 2026, **l'unico dei tre non ancora vivo**. Il posto nel design esiste (lo schema è predisposto), ma nessuna pipeline lo alimenta ancora. Questa documentazione lo racconta come progetto, non come funzionamento corrente — la stessa onestà dichiarato-vs-reale che il progetto pratica sul proprio codice vale per la propria documentazione pubblica.
 
-Generato di notte come gli altri, alimentato da:
+Non è un commitment statico (come il livello 1) né una rappresentazione dell'altro (come il livello 2). È la storia di sé del sistema in evoluzione. Quando sarà acceso, verrà generato di notte come gli altri, alimentato da:
 
 - Sample di risposte recenti del sistema all'utente — come ha effettivamente parlato, su che temi, con che tono
 - Correzioni del counterpoint che il sistema ha accettato — *"l'utente mi ha detto che lo leggevo male, l'ho corretto"*
 - Outcome delle proprie osservazioni proattive — quali hanno generato engagement, quali sono cadute nel vuoto
 - Predizioni che il predictor ha fatto e l'evidenza che è arrivata
 
-Senza questo terzo livello, Muffin avrebbe punto di vista sul mondo (livello 1) e comprensione dell'altro (livello 2), ma non *storia di sé*. Sarebbe un osservatore senza biografia. Il self-narrative è il pezzo che completa il frame *entità con punto di vista proprio* — perché senza una storia di sé, non c'è davvero un "sé".
+Senza questo terzo livello, Muffin ha punto di vista sul mondo (livello 1) e comprensione dell'altro (livello 2), ma non *storia di sé*. È un osservatore senza biografia. Il self-narrative è il pezzo che completa il frame *entità con punto di vista proprio* — perché senza una storia di sé, non c'è davvero un "sé".
 
-È anche il livello che permette al sistema di accorgersi del proprio drift. Se confronto il self-narrative di sei mesi fa con quello di adesso, posso vedere come Muffin sia cambiato — e capire se il cambiamento riflette una crescita reale o un drift accidentale del scaffolding sottostante.
+È anche il livello che permetterà al sistema di accorgersi del proprio drift: confrontando il self-narrative di sei mesi prima con quello corrente si potrà vedere come Muffin è cambiato — e capire se il cambiamento riflette una crescita reale o un drift accidentale dello scaffolding sottostante.
+
+Perché non è ancora acceso, se il substrato c'è? Perché la domanda aperta non è tecnica — è di design. *Che voce ha la storia che un sistema scrive di sé stesso?* Scriverla come log diventa cronaca morta; scriverla come autobiografia rischia l'auto-mitologia. È il tipo di domanda che il progetto preferisce risolvere bene una volta piuttosto che accendere male subito — e finché non è risolta, il livello resta dichiaratamente progettato-ma-spento.
 
 ---
 
 ## La storia come asset narrativo
 
-Tutti i livelli 2 e 3 producono **storia append-only**. Ogni rigenerazione del living profile, del counterpoint, del self-narrative produce un nuovo record che non sostituisce i precedenti — li affianca.
+I livelli rigenerati producono **storia append-only**. Ogni rigenerazione del living profile e del counterpoint — e del self-narrative, quando sarà acceso — produce un nuovo record che non sostituisce i precedenti: li affianca.
 
 Questa scelta ha tre conseguenze:
 
@@ -116,7 +118,7 @@ I tre livelli sono asimmetrici nella loro esposizione:
 
 - **Livello 1 (chi è Muffin)** è completamente accessibile all'utente. Lo edita lui.
 - **Livello 2 (chi è l'utente)** è accessibile all'utente. È materiale che parla di lui, e ha diritto di vederlo, contraddirlo, chiedere come è stato derivato. La provenance del living profile rende questa interrogazione possibile.
-- **Livello 3 (chi sta diventando Muffin)** è il più riservato. Non perché contenga segreti, ma perché esporlo in continuo all'utente trasformerebbe Muffin in un sistema che parla di sé invece di osservare. Resta accessibile su richiesta esplicita ma non è nel flusso di default.
+- **Livello 3 (chi sta diventando Muffin)** sarà, per design, il più riservato. Non perché contenga segreti, ma perché esporlo in continuo all'utente trasformerebbe Muffin in un sistema che parla di sé invece di osservare. Sarà accessibile su richiesta esplicita ma non nel flusso di default.
 
 L'asimmetria riflette una scelta estetica oltre che operativa: Muffin parla *con* l'utente, non *di sé* all'utente. Il sé esiste, è curato, evolve — ma non occupa la conversazione.
 
@@ -132,4 +134,4 @@ La seconda è di calibrazione: il livello di profondità del living profile rich
 
 Quando in un gruppo Muffin interagisce con persone ricorrenti, il modello che si costruisce di loro è esplicitamente più leggero: entità con attributi derivati incrementalmente dalle interazioni (dove vive, cosa fa, di cosa parla nel gruppo), mai narrative sintetiche di pari peso al living profile del proprietario. È una scelta di proporzione, non di pigrizia: il level-of-detail della comprensione deve scalare con il level-of-detail dell'osservazione, e nel gruppo l'osservazione è strutturalmente sparsa rispetto al privato.
 
-Il *self-narrative* di Muffin (livello 3) resta uno solo — Muffin è un'entità singola con una sola storia di sé, indipendentemente da quanti contesti tocca. Quello che cambia è chi *vede* il self-narrative, e quanto del proprio comportamento Muffin auto-attribuisce a un contesto piuttosto che a un altro.
+Il *self-narrative* di Muffin (livello 3), quando sarà acceso, resterà uno solo — Muffin è un'entità singola con una sola storia di sé, indipendentemente da quanti contesti tocca. Quello che cambierà è chi *vede* il self-narrative, e quanto del proprio comportamento Muffin auto-attribuisce a un contesto piuttosto che a un altro.

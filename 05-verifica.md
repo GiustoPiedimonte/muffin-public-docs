@@ -1,6 +1,6 @@
 # 05. Verifica e affidabilità
 
-> Come Muffin riconosce di non sapere, perché la confidence va resa esplicita per ogni claim, come la verifica deterministica dei nomi propri compensa la tendenza a confabulare, e perché alcune scelte costano cicli di calcolo che valgono la pena.
+> Come Muffin riconosce di non sapere, perché la confidence va resa esplicita per ogni claim, come la verifica deterministica dei nomi propri compensa la tendenza a confabulare, perché "cosa hai fatto stanotte?" si risponde leggendo un log e non ricostruendo a memoria — e come la stessa disciplina di verifica si applica, via eval su casi reali, alle decisioni architetturali del progetto stesso.
 
 ---
 
@@ -109,6 +109,18 @@ Il dettaglio operativo è trattato nel capitolo memoria sotto la voce *belief re
 
 ---
 
+## Memoria autobiografica — narrare leggendo, non ricostruendo
+
+C'è una classe di confabulazione che i meccanismi visti finora non coprono: quella del sistema **sulle proprie azioni**. *"Stanotte ho consolidato il grafo"*, *"te l'ho già salvato ieri"* — detti con piena confidenza, perfettamente coerenti, e inventati. È una classe insidiosa per una ragione precisa: i metodi che rilevano l'allucinazione misurando l'*incertezza* del modello (campionare più risposte e confrontarle, stimare l'entropia semantica) qui sono ciechi, perché una confabulazione d'azione non è incerta — è confidente e internamente coerente. Il modello non sta esitando tra versioni: sta raccontando con convinzione una giornata plausibile che non è avvenuta.
+
+Il progetto ha una storia istruttiva su questo punto. Una prima risposta al problema era stata un *verificatore post-hoc* di claim temporali: regex che riconoscevano formule come "stamattina" e "stanotte" nelle risposte, e un controllo a valle. In tutta la sua vita operativa ha flaggato **una volta**. È stato rimosso in una consolidation, a ragione. Quando il problema è riemerso mesi dopo, la tentazione era reintrodurlo — e la ricerca fatta prima di cedere alla tentazione (due survey indipendenti, una sui paper e una sui sistemi in produzione) ha mostrato che nessun sistema maturo costruisce un verificatore dedicato per questo: l'ancoraggio emerge dal **log d'azione strutturato**. *"Cosa ho fatto"* non è una generazione da verificare — è una *lettura* da eseguire.
+
+Il meccanismo attuale segue quella linea. Quando il messaggio dell'utente chiede conto dell'attività recente del sistema (*"cosa hai fatto stanotte?"*, *"hai poi sistemato quella cosa?"*), un trigger semantico lo riconosce — per similarità vettoriale con il concetto di "domanda sull'attività del sistema", non con una word-list di formule da matchare — e il sistema inietta nel contesto un blocco costruito da una **lettura deterministica del proprio log d'azione** delle ultime 24 ore, con voci timestampate. Muffin narra *leggendo*, non ricostruendo a memoria.
+
+È lo stesso pattern della working memory per i deittici (capitolo memoria): invece di correggere a valle quello che il modello ha generato male, gli si mette sotto gli occhi la fonte giusta *prima* che generi. Rimuovere la confabulazione alla fonte batte rincorrerla a valle — e costa meno: una query, zero chiamate aggiuntive al modello, nessun verificatore da mantenere.
+
+---
+
 ## Pattern lifecycle — la verifica nel tempo
 
 Un pattern (*"di solito quando X allora Y"*) non è un fatto statico. È una credenza statistica che resta valida fintanto che l'evidenza la conferma. Quando l'evidenza nuova non la conferma più, il pattern deve essere aggiornato — ma in modo che la sua storia non sparisca.
@@ -122,6 +134,24 @@ Muffin gestisce il ciclo di vita di un pattern in fasi:
 5. **Invalidazione temporale** — se nuova evidenza esplicita lo smentisce, il pattern viene marcato non più valido da una certa data, ma resta interrogabile come parte della storia.
 
 Il principio: i pattern *invecchiano* come le persone. Una volta veri, non lo sono più; o lo erano in un periodo specifico e non lo sono più ora. La bi-temporalità (vedi capitolo memoria) si applica ai pattern come si applica ai fatti — un pattern non scompare quando perde validità, smette solo di essere usato per il presente.
+
+---
+
+## Eval come gate — verificare il sistema, non solo l'output
+
+Tutto quanto sopra verifica *l'output* del sistema. Da fine maggio 2026 la stessa disciplina si applica un livello sopra: alle **decisioni architetturali** del progetto. Lo strumento è una suite di eval costruita su casi reali del dataset — fixture curate a mano da conversazioni effettive, inclusa una collezione di *turni difficili* (i casi in cui il sistema storicamente sbaglia: salti di tool, riferimenti temporali, ambiguità deittiche) — che misura come un modello si comporta sui *nostri* dati, non su benchmark generici.
+
+La regola che ne è discesa: **un cambio di modello non è un flip di configurazione — è un eval gate.** Un prompt e una superficie di tool ottimizzati per un modello perdono decine di punti su un altro; chi cambia il motore ri-misura tutto, prima. (È anche la storia del futuro open source: *porta il tuo modello, ri-baselina con la suite*.)
+
+Tre episodi del giugno 2026 mostrano cosa significa in pratica prendere questa regola sul serio.
+
+**Il reversal.** Il progetto aveva scelto un nuovo modello primario sulla base delle sue caratteristiche dichiarate. Le misure, fatte dopo, hanno detto l'opposto: sulla qualità di estrazione (il moat) e sulla tenuta della voce (l'identità) il modello scelto era *peggiore*, e su un asse critico — l'affidabilità agentica — fingeva azioni quasi metà delle volte. La scelta è stata ribaltata in tre giorni. Non è un incidente imbarazzante da nascondere: è il sistema di decisione che funziona. Una decisione sbagliata sopravvissuta tre giorni costa poco; la stessa decisione difesa per orgoglio per sei mesi avvelena il dataset.
+
+**Il refactor falsificato.** La letteratura suggeriva di sostituire la superficie a meta-tool del sistema di memoria con tool atomici piatti. Misurato sul modello in produzione: meno trenta punti di accuratezza nella selezione. Il refactor non è stato shippato. La barra era deliberatamente asimmetrica — il cambiamento doveva *migliorare* le misure per passare, non limitarsi a non peggiorare — e ha falsificato un'idea plausibile prima che diventasse una regressione.
+
+**Il meccanismo rimosso.** Un eval aveva mostrato che il modello allora in produzione fingeva certe azioni la metà delle volte (*"te lo ricordo"* senza chiamare davvero il tool del promemoria). La risposta era stata un meccanismo deterministico che eseguiva l'azione da codice. Mesi dopo, la *stessa misura ripetuta sul modello effettivamente deployato* ha dato 30 su 30: il modello nuovo non finge. Il meccanismo è stato rimosso — non per pulizia estetica, ma perché la misura che lo giustificava non valeva più. Resta il monitor passivo, e un criterio esplicito di ritorno: se le azioni finte riappaiono in produzione, il meccanismo si riaccende mirato su quella famiglia di azioni. *Osserva prima, imponi solo su evidenza.*
+
+La lezione trasversale dei tre episodi: **un eval sintetico valida il meccanismo, non la magnitudine sul modello reale** — e una misura fatta su un modello non si trasferisce al successivo. È la stessa onestà dichiarato-vs-reale degli audit periodici (capitolo riferimenti), applicata alle decisioni invece che alle pipeline: lo scarto tra ciò che il progetto crede e ciò che è misurabilmente vero produce interventi, in entrambe le direzioni — anche quando l'intervento è disfare qualcosa di costruito da poco.
 
 ---
 

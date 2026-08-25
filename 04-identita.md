@@ -1,3 +1,7 @@
+> **HISTORICAL · H1 2026** — Living profile, counterpoint and dream-cycle identity
+> are preserved experiments, not current runtime claims. Start with the
+> [current documentation](README.md).
+
 # 04. Identità lunga
 
 > Tre livelli di sé. Chi è Muffin per principio (statico). Chi è l'utente nella comprensione di Muffin (rigenerato di notte). Chi sta diventando Muffin nel tempo (storia di sé — progettato, non ancora acceso). Più il *counterpoint*, dove Muffin riconosce di leggere male l'utente.

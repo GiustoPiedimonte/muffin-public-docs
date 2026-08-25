@@ -1,3 +1,6 @@
+> **HISTORICAL · H1 2026** — This roadmap snapshot is superseded by the
+> [current public roadmap](docs/ROADMAP.md).
+
 # 07. Roadmap
 
 > Da dove viene il progetto, dove è adesso, cosa c'è all'orizzonte — e cosa non ci sarà mai. Senza date promesse: i cicli chiudono su condizioni di completamento, non a calendario.

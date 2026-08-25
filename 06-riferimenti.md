@@ -1,3 +1,7 @@
+> **HISTORICAL · H1 2026** — These references explain the earlier architecture's
+> lineage. They do not prove that a cited mechanism exists in the current
+> runtime. Start with the [current documentation](README.md).
+
 # 06. Riferimenti
 
 > I lavori di ricerca, i progetti open source e le ispirazioni culturali che hanno informato il design di Muffin. Sta in un lignaggio scientifico, non in un'invenzione isolata.

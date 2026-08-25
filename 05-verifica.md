@@ -1,3 +1,7 @@
+> **HISTORICAL · H1 2026** — This chapter records earlier mechanisms and evidence.
+> Current public status lives in [Current product](docs/CURRENT.md) and
+> [Security](docs/SECURITY.md).
+
 # 05. Verifica e affidabilità
 
 > Come Muffin riconosce di non sapere, perché la confidence va resa esplicita per ogni claim, come la verifica deterministica dei nomi propri compensa la tendenza a confabulare, perché "cosa hai fatto stanotte?" si risponde leggendo un log e non ricostruendo a memoria — e come la stessa disciplina di verifica si applica, via eval su casi reali, alle decisioni architetturali del progetto stesso.

@@ -1,3 +1,6 @@
+> **HISTORICAL · H1 2026** — This FAQ describes an earlier Muffin generation.
+> See the [current FAQ](docs/FAQ.md).
+
 # 08. FAQ
 
 > Le domande che un curioso fa per prime, con risposte dirette. Ogni risposta punta al capitolo che approfondisce — qui si risponde, là si spiega.

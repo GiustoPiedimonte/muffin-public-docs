@@ -1,3 +1,7 @@
+> **HISTORICAL · H1 2026** — This chapter describes an earlier Muffin generation.
+> It is preserved for research and citation, not as a current runtime claim.
+> Start with the [current documentation](README.md).
+
 # 01. Filosofia
 
 > Le decisioni tecniche di Muffin discendono da una tesi sul mondo. Senza la tesi, le decisioni sembrano scelte di gusto. Con la tesi, sono coerenza strategica.

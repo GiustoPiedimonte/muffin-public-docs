@@ -1,3 +1,7 @@
+> **HISTORICAL · H1 2026** — This memory model describes an earlier Muffin
+> generation. See the [current product](docs/CURRENT.md) and
+> [public architecture](docs/ARCHITECTURE.md).
+
 # 03. Sistema di memoria
 
 > Il modello a layer, l'entity graph come rappresentazione del mondo, la bi-temporalità che permette di sbagliare e correggersi senza perdere storia, la provenance che ancora ogni claim alla sua sorgente, e il dream cycle notturno che consolida e rigenera.

@@ -1,3 +1,7 @@
+> **HISTORICAL · H1 2026** — The awareness loop and its named mechanisms are not
+> the current `muffin-agent` architecture. Start with the
+> [current documentation](README.md).
+
 # 02. Architettura cognitiva
 
 > I sei pilastri funzionali, l'*awareness loop* che sostituisce i tick periodici, la *cognitive transparency* che rende il modello consapevole del proprio stato interno, e il primo strato dell'*executive* — skill come programmi con piano fisso, e bozza-da-confermare per tutto ciò che esce verso terzi.

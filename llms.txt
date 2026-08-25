@@ -1,0 +1,21 @@
+# Muffin public documentation
+
+> Status: developer preview, pre-DAY-1. Current product claims are intentionally
+> narrower than the vision. Numbered Italian chapters are historical H1 2026
+> material and must not be presented as the current runtime.
+
+## Current sources
+
+- README.md — public overview and maturity labels
+- docs/VISION.md — product destination, explicitly ahead of runtime
+- docs/CURRENT.md — current public capability and non-capability claims
+- docs/ARCHITECTURE.md — current public architecture boundaries
+- docs/INSTALL.md — authorised developer-preview installation and use
+- docs/ROADMAP.md — product phases without release dates
+- docs/SECURITY.md — current public security and privacy boundaries
+- docs/FAQ.md — common distinctions and status questions
+
+## Historical sources
+
+- HISTORY.md — index and interpretation rule for the H1 2026 corpus
+- 01-filosofia.md through 08-faq.md — historical, not current
